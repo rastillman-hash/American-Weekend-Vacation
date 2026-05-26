@@ -132,7 +132,7 @@ const CFG = {
         { id: 'sprint',     name: 'Sprint Burst',   desc: 'Dash with a speed burst! (SHIFT)',       color: '#00DDFF', icon: '💨' },
         { id: 'doubleJump', name: 'Double Jump',    desc: 'Jump again in mid-air! (SPACE x2)',      color: '#FFDD00', icon: '🦘' },
         { id: 'powerDrill', name: 'Power Drill',    desc: 'Dig through anything! (DOWN)',            color: '#FF8800', icon: '⚙️' },
-        { id: 'bigChompers',name: 'Big Chompers',   desc: 'Bite metal & big enemies! (Z)',          color: '#FF4488', icon: '🦷' }
+        { id: 'bigChompers',name: 'Big Chompers',   desc: 'Bite metal & big enemies! (E)',          color: '#FF4488', icon: '🦷' }
     ],
 
     KEYS: {
@@ -140,7 +140,7 @@ const CFG = {
         RIGHT:  ['ArrowRight', 'd', 'D'],
         JUMP:   ['ArrowUp',    'w', 'W', ' '],
         ROLL:   ['ArrowDown',  's', 'S'],
-        ATTACK: ['z', 'Z'],
+        ATTACK: ['e', 'E'],
         SPRINT: ['Shift'],
         CONFIRM:['Enter', ' '],
         ESCAPE: ['Escape']

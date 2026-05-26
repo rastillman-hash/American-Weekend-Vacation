@@ -91,9 +91,9 @@ const Sprites = {
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Brown head patch
+        // Natural saddle patch — side of face only (classic Jack Russell marking)
         ctx.beginPath();
-        ctx.ellipse(headX + 2, headY - 3, 9, 7, 0.2, 0, Math.PI * 2);
+        ctx.ellipse(headX + 5, headY + 2, 6, 4.5, 0.4, 0, Math.PI * 2);
         ctx.fillStyle = '#8B6914';
         ctx.fill();
 

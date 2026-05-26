@@ -247,6 +247,7 @@ const Game = (() => {
                 player.addScore(1000 * levelId);
                 buildUpgradeMenu();
                 levelCompleteFrame = 0;
+                _transitioning = false; // allow upgrade screen to read input
                 state = 'UPGRADE';
             }
         }

@@ -2,7 +2,7 @@
 
 > *A 7-level 2D side-scrolling adventure — sunrise to neon night — starring Biscuit, the world's most determined Jack Russell terrier.*
 
-[![Play Now](https://img.shields.io/badge/🎮%20Play%20Now-Live%20Site-FFD700?style=for-the-badge)](https://rastillman-hash.github.io/American-Weekend-Vacation/)
+[![Play Now](https://img.shields.io/badge/🎮%20Play%20Now-Live%20Site-FFD700?style=for-the-badge)](https://rastillman-hash.github.io/Golden-Biscuit/)
 
 ---
 
@@ -26,7 +26,7 @@ Complete all 7 levels to earn the **Golden Peanut Butter Biscuit** — then repl
 
 **No download or installation required.** The game runs entirely in your browser.
 
-### 👉 [Play Golden Biscuit here](https://rastillman-hash.github.io/American-Weekend-Vacation/)
+### 👉 [Play Golden Biscuit here](https://rastillman-hash.github.io/Golden-Biscuit/)
 
 > Works best in a modern desktop browser (Chrome, Firefox, Edge, Safari).  
 > Make sure your browser window is wide enough to see the full 960 × 540 canvas.

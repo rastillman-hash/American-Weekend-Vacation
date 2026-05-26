@@ -156,7 +156,78 @@ function buildLevel(id) {
         decorations: 'streets'
     };
 
-    /* ── LEVELS 3-7: generated ── */
+    /* ── LEVEL 3: The Neighborhood ── */
+    case 3: return {
+        platforms: [
+            // Main ground — cracked neighborhood sidewalk
+            new Platform(0,    GROUND_Y, 3400, GH, G, A),
+            // Picket fence top jumps (low wood sections)
+            new Platform(280,  GROUND_Y - 55, 80,  12, '#D2B48C', '#8B6914'),
+            new Platform(460,  GROUND_Y - 55, 80,  12, '#D2B48C', '#8B6914'),
+            // Porch steps — ascending toward first house
+            new Platform(700,  GROUND_Y - 50,  110, 16, '#C0A882', '#8B6914'),
+            new Platform(760,  GROUND_Y - 100,  80, 16, '#C0A882', '#8B6914'),
+            // Garden stone wall
+            new Platform(960,  GROUND_Y - 85,  140, 16, '#9aaf7a', '#5a7a3a'),
+            // Mid-section chain — rooftops / yard walls
+            new Platform(1200, GROUND_Y - 120, 100, 16, '#C0A882', '#8B6914'),
+            new Platform(1420, GROUND_Y - 70,  120, 16, '#9aaf7a', '#5a7a3a'),
+            // Checkpoint landing — wide porch slab
+            new Platform(1620, GROUND_Y - 50,  160, 20, '#C0A882', '#8B6914'),
+            // Second-half platforms — deeper into Don Whiskers' turf
+            new Platform(1900, GROUND_Y - 100, 110, 16, '#9aaf7a', '#5a7a3a'),
+            new Platform(2110, GROUND_Y - 60,  100, 16, '#C0A882', '#8B6914'),
+            new Platform(2310, GROUND_Y - 135, 130, 16, '#9aaf7a', '#5a7a3a'),
+            new Platform(2560, GROUND_Y - 80,  110, 16, '#C0A882', '#8B6914'),
+            new Platform(2760, GROUND_Y - 60,  100, 16, '#9aaf7a', '#5a7a3a'),
+            // Boss arena — wide brick porch leading to Don Whiskers' window
+            new Platform(2880, GROUND_Y - 40,  520, 20, '#C0A882', '#8B6914'),
+            // Raised crate/trash-can step — lets player reach window to attack
+            new Platform(3010, GROUND_Y - 110, 110, 16, '#C0A882', '#8B6914'),
+        ],
+        enemies: [
+            // Early muscle — guard dogs in the outer yard
+            createEnemy('mediumDog',  340,  GROUND_Y - 36),
+            createEnemy('mediumDog',  580,  GROUND_Y - 36),
+            // Don Whiskers' street-cat crew — closing in from all sides
+            createEnemy('streetCat',  820,  GROUND_Y - 26),
+            createEnemy('streetCat',  1060, GROUND_Y - 26),
+            createEnemy('streetCat',  1260, GROUND_Y - 26),
+            createEnemy('streetCat',  1480, GROUND_Y - 26),
+            createEnemy('streetCat',  1720, GROUND_Y - 26),
+            createEnemy('streetCat',  1960, GROUND_Y - 26),
+            createEnemy('streetCat',  2160, GROUND_Y - 26),
+            createEnemy('streetCat',  2420, GROUND_Y - 26),
+            createEnemy('streetCat',  2640, GROUND_Y - 26),
+            createEnemy('streetCat',  2820, GROUND_Y - 26),
+            // Don Whiskers — fat cat mob boss, commanding from behind his window
+            createEnemy('fatCatBoss', 3100, GROUND_Y - 158),
+        ],
+        food: [
+            new Collectible(200,  GROUND_Y - 30, 'kibble'),
+            new Collectible(400,  GROUND_Y - 65, 'treat'),
+            new Collectible(640,  GROUND_Y - 30, 'kibble'),
+            new Collectible(870,  GROUND_Y - 30, 'treat'),
+            new Collectible(1010, GROUND_Y - 30, 'kibble'),
+            new Collectible(1160, GROUND_Y - 130,'biscuit'),
+            new Collectible(1370, GROUND_Y - 30, 'kibble'),
+            new Collectible(1540, GROUND_Y - 60, 'treat'),
+            new Collectible(1680, GROUND_Y - 30, 'kibble'),
+            new Collectible(1870, GROUND_Y - 30, 'treat'),
+            new Collectible(2080, GROUND_Y - 30, 'hotdog'),
+            new Collectible(2260, GROUND_Y - 145,'biscuit'),
+            new Collectible(2490, GROUND_Y - 30, 'kibble'),
+            new Collectible(2700, GROUND_Y - 30, 'treat'),
+            new Collectible(2840, GROUND_Y - 50, 'hotdog'),
+            new Collectible(2910, GROUND_Y - 50, 'biscuit'),
+        ],
+        checkpoints: [new Checkpoint(1630, GROUND_Y)],
+        bossSpawnX: 3100,
+        exitX: 3300,
+        decorations: 'neighborhood'
+    };
+
+    /* ── LEVELS 4-7: generated ── */
     default: {
         const levelW = cfg.width;
         const numEnemies = 8 + id * 2;
@@ -390,6 +461,74 @@ class Level {
                     ctx.fillStyle = lightOn === i ? c : '#333'; ctx.fill();
                 });
             }
+        } else if (this.decorations === 'neighborhood') {
+            // Background house silhouette
+            const hx = 180 - camX * 0.2;
+            if (hx > -260 && hx < CFG.W + 60) {
+                ctx.save();
+                ctx.globalAlpha = 0.55;
+                // House body
+                ctx.fillStyle = '#b0c890';
+                ctx.fillRect(hx, GROUND_Y - 220, 200, 180);
+                // Roof (triangle)
+                ctx.beginPath();
+                ctx.moveTo(hx - 20, GROUND_Y - 220);
+                ctx.lineTo(hx + 100, GROUND_Y - 320);
+                ctx.lineTo(hx + 220, GROUND_Y - 220);
+                ctx.closePath();
+                ctx.fillStyle = '#7a9a5a'; ctx.fill();
+                // Door
+                ctx.fillStyle = '#5a3a1a';
+                ctx.fillRect(hx + 80, GROUND_Y - 90, 40, 50);
+                // Windows
+                ctx.fillStyle = '#ffe0a0';
+                ctx.fillRect(hx + 20,  GROUND_Y - 180, 45, 40);
+                ctx.fillRect(hx + 135, GROUND_Y - 180, 45, 40);
+                ctx.restore();
+            }
+            // "NO DOGS ALLOWED" sign near Don Whiskers' turf
+            const sx = 2780 - camX;
+            if (sx > -200 && sx < CFG.W + 60) {
+                // Sign post
+                ctx.fillStyle = '#5a3a1a';
+                ctx.fillRect(sx + 55, GROUND_Y - 140, 8, 100);
+                // Sign board
+                ctx.fillStyle = '#CC2200';
+                U.roundRect(ctx, sx, GROUND_Y - 145, 118, 50, 6);
+                ctx.fill();
+                ctx.strokeStyle = '#880000'; ctx.lineWidth = 3; ctx.stroke();
+                // Circle-slash (no dogs)
+                ctx.save();
+                ctx.globalAlpha = 0.9;
+                ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.arc(sx + 18, GROUND_Y - 120, 11, 0, Math.PI * 2); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(sx + 10, GROUND_Y - 128); ctx.lineTo(sx + 26, GROUND_Y - 112); ctx.stroke();
+                ctx.restore();
+                U.drawText(ctx, 'NO DOGS', sx + 72, GROUND_Y - 132, { size: 13, color: '#fff', outline: '#880000', outlineW: 2 });
+                U.drawText(ctx, 'ALLOWED', sx + 72, GROUND_Y - 115, { size: 13, color: '#FFD700', outline: '#880000', outlineW: 2 });
+            }
+            // Picket fence posts in the background (parallax)
+            ctx.save();
+            ctx.globalAlpha = 0.4;
+            ctx.fillStyle = '#D2B48C';
+            ctx.strokeStyle = '#8B6914'; ctx.lineWidth = 1.5;
+            for (let fi = 0; fi < 18; fi++) {
+                const fx = (fi * 180 + 100) - camX * 0.35;
+                if (fx < -20 || fx > CFG.W + 20) continue;
+                // Post
+                ctx.fillRect(fx, GROUND_Y - 80, 10, 80);
+                // Pointed top
+                ctx.beginPath();
+                ctx.moveTo(fx, GROUND_Y - 80);
+                ctx.lineTo(fx + 5, GROUND_Y - 96);
+                ctx.lineTo(fx + 10, GROUND_Y - 80);
+                ctx.closePath(); ctx.fill();
+                // Rail
+                ctx.fillRect(fx - 80, GROUND_Y - 68, 180, 8);
+                ctx.fillRect(fx - 80, GROUND_Y - 48, 180, 8);
+                ctx.strokeRect(fx, GROUND_Y - 80, 10, 80);
+            }
+            ctx.restore();
         }
 
         // exit sign (golden paw prints near exit)

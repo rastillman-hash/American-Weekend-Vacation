@@ -430,6 +430,166 @@ class GenericBoss extends Enemy {
     }
 }
 
+/* ── Street Cat (Level 3 standard enemy) ── */
+class StreetCat extends Enemy {
+    constructor(x, y) {
+        super(x, y, 30, 26);
+        this.health = 25;
+        this.maxHealth = 25;
+        this.damage = 10;
+        this.score = 80;
+        this.aggroRange = 220;
+        this.type = 'streetCat';
+        this.patrolLeft  = x - 70;
+        this.patrolRight = x + 70;
+        this._lungeTimer = 0;
+        this._lungeActive = false;
+    }
+
+    _ai(player, levelScale) {
+        const dist = Math.abs(player.cx - this.cx);
+        const dir  = player.cx > this.cx ? 1 : -1;
+
+        if (dist < this.aggroRange) {
+            this._alertLevel = dist < 80 ? 2 : 1;
+
+            // lunge pounce when close
+            if (!this._lungeActive && dist < 100 && this._lungeTimer <= 0) {
+                this._lungeActive = true;
+                this._lungeTimer = 25;
+                this.vx = dir * 7 * levelScale;
+                this.vy = -6; // pounce arc
+            }
+        } else {
+            this._alertLevel = 0;
+        }
+
+        if (this._lungeActive) {
+            this._lungeTimer--;
+            if (this._lungeTimer <= 0) {
+                this._lungeActive = false;
+                this._lungeTimer = 60; // cooldown before next lunge
+            }
+        } else if (!this._lungeActive) {
+            if (this._lungeTimer > 0) this._lungeTimer--;
+            if (dist < this.aggroRange) {
+                this.vx = dir * 2.2 * levelScale;
+            } else {
+                if (this.cx < this.patrolLeft)  this.vx =  1.3;
+                if (this.cx > this.patrolRight) this.vx = -1.3;
+            }
+        }
+    }
+
+    _draw(ctx, camX) {
+        Sprites.streetCat(ctx, this.cx - camX, this.bottom, this.facing, this._frame, this._alertLevel);
+    }
+}
+
+/* ── Fat Cat Boss — Don Whiskers (Level 3 boss) ── */
+class FatCatBoss extends Enemy {
+    constructor(x, y) {
+        super(x, y, 92, 158);
+        this.health    = 280;
+        this.maxHealth = 280;
+        this.damage    = 18;
+        this.score     = 1500;
+        this.aggroRange= 600;
+        this.isBoss    = true;
+        this.type      = 'fatCatBoss';
+        this._phase        = 0;
+        this._phaseTimer   = 0;
+        this._swipeActive  = false;
+        this._swipeTimer   = 0;
+        this.facing        = -1; // faces left toward the player by default
+    }
+
+    /* Boss never moves — it rules from the window */
+    update(player, platforms, levelScale = 1) {
+        if (this.dead) return;
+        this._frame++;
+        if (this._hitFlash > 0) this._hitFlash--;
+
+        // Phase thresholds
+        if (this.health < this.maxHealth * 0.33 && this._phase < 2) this._phase = 2;
+        else if (this.health < this.maxHealth * 0.66 && this._phase < 1) this._phase = 1;
+
+        this._phaseTimer++;
+        this._alertLevel = this._phase;
+
+        // Face toward the player
+        this.facing = player.cx < this.cx ? -1 : 1;
+
+        // Paw swipe attack (phase 1+) — reaches through the torn screen
+        if (this._phase >= 1) {
+            if (!this._swipeActive && this._phaseTimer % 80 === 0) {
+                this._swipeActive = true;
+                this._swipeTimer  = 35;
+            }
+        }
+        if (this._swipeActive) {
+            this._swipeTimer--;
+            if (this._swipeTimer <= 0) this._swipeActive = false;
+        }
+    }
+
+    hitsPlayer(player) {
+        if (this.dead) return false;
+        // Phase 2 paw swipe zone — reaches 80px outside the window on the player's side
+        if (this._phase >= 2 && this._swipeActive) {
+            const swipeX = this.facing > 0 ? this.right : this.left - 80;
+            if (U.rectsOverlap(swipeX, this.y + 60, 80, 60, player.x, player.y, player.w, player.h)) return true;
+        }
+        // Phase 1 standard window contact (player who bumps the sill gets scratched)
+        if (this._phase >= 1) {
+            return U.rectsOverlap(this.x, this.y + 80, this.w, 78, player.x, player.y, player.w, player.h);
+        }
+        return false;
+    }
+
+    _draw(ctx, camX) {
+        Sprites.fatCatBoss(ctx, this.cx - camX, this.bottom, this.facing, this._frame, this._phase);
+    }
+
+    renderBossHUD(ctx) {
+        const bw = 400, bh = 24;
+        const bx = (CFG.W - bw) / 2, by = CFG.H - 50;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        U.roundRect(ctx, bx - 10, by - 32, bw + 20, bh + 42, 8);
+        ctx.fill();
+
+        const phaseLabel = ['Giving Orders', 'Paw Swiping', 'CLAWS OUT!'][this._phase];
+        U.drawText(ctx, `😼  DON WHISKERS — THE NEIGHBORHOOD PAW  😼`, CFG.W / 2, by - 16, {
+            size: 14, color: '#FFD700', outline: '#000', outlineW: 3
+        });
+        U.drawText(ctx, phaseLabel, CFG.W / 2, by - 2, {
+            size: 10, color: '#FF8888', outline: '#000', outlineW: 2
+        });
+
+        // health track
+        ctx.fillStyle = '#1a0800';
+        U.roundRect(ctx, bx, by + 10, bw, bh, 4);
+        ctx.fill();
+        const barColor = this._phase >= 2 ? '#FF2200' : this._phase >= 1 ? '#FF8800' : '#FF6600';
+        ctx.fillStyle = barColor;
+        U.roundRect(ctx, bx, by + 10, bw * (this.health / this.maxHealth), bh, 4);
+        ctx.fill();
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 2;
+        U.roundRect(ctx, bx, by + 10, bw, bh, 4);
+        ctx.stroke();
+
+        // phase paw-print pips
+        for (let i = 0; i < 3; i++) {
+            const filled = i <= this._phase;
+            ctx.font = '14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(filled ? '🐾' : '○', bx + bw + 18 + i * 22, by + 24);
+        }
+    }
+}
+
 /* Factory */
 function createEnemy(type, x, y, levelId = 1) {
     switch (type) {

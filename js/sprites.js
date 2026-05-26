@@ -232,6 +232,386 @@ const Sprites = {
         ctx.restore();
     },
 
+    /* ── STREET CAT ENEMY ── */
+    streetCat(ctx, cx, cy, facing, frame, alertLevel = 0) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        if (facing < 0) ctx.scale(-1, 1);
+        const t = frame * 0.13;
+        const alert = alertLevel > 0;
+        const bob = alert ? Math.sin(t * 7) * 2 : 0;
+
+        // tail
+        ctx.strokeStyle = '#778899';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        if (alert) {
+            ctx.moveTo(-10, -10 + bob);
+            ctx.quadraticCurveTo(-22, -32, -10, -44 + bob);
+        } else {
+            ctx.moveTo(-10, -6 + bob);
+            ctx.quadraticCurveTo(-22, -14, -16, -26 + bob);
+        }
+        ctx.stroke();
+
+        // body
+        ctx.beginPath();
+        ctx.ellipse(0, -18 + bob, alert ? 10 : 13, 11, alert ? -0.4 : 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#8899AA';
+        ctx.fill();
+        ctx.strokeStyle = '#556677';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        // tabby stripes
+        ctx.strokeStyle = '#667788';
+        ctx.lineWidth = 1.2;
+        [-6, 0, 6].forEach(sx => {
+            ctx.beginPath();
+            ctx.moveTo(sx, -24 + bob); ctx.lineTo(sx, -13 + bob);
+            ctx.stroke();
+        });
+
+        // head
+        ctx.beginPath();
+        ctx.ellipse(13, -26 + bob, 11, 10, 0.15, 0, Math.PI * 2);
+        ctx.fillStyle = '#8899AA';
+        ctx.fill();
+        ctx.strokeStyle = '#556677';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // ears (sharp, pointy)
+        ctx.fillStyle = '#8899AA';
+        ctx.strokeStyle = '#556677';
+        ctx.lineWidth = 1.5;
+        // left ear (good)
+        ctx.beginPath();
+        ctx.moveTo(5, -31 + bob); ctx.lineTo(8, -43 + bob); ctx.lineTo(14, -31 + bob);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        // right ear (notched / battle-scarred)
+        ctx.beginPath();
+        ctx.moveTo(18, -31 + bob); ctx.lineTo(24, -43 + bob); ctx.lineTo(26, -33 + bob);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+        // notch scar
+        ctx.strokeStyle = '#556677';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(22, -40 + bob); ctx.lineTo(25, -36 + bob);
+        ctx.stroke();
+        // inner ear pink
+        ctx.fillStyle = '#FFAABB';
+        ctx.beginPath();
+        ctx.moveTo(7, -33 + bob); ctx.lineTo(9, -40 + bob); ctx.lineTo(13, -33 + bob);
+        ctx.closePath(); ctx.fill();
+
+        // eyes (green, slitted when alert)
+        const eyeH = alert ? 2 : 5;
+        ctx.fillStyle = '#22CC66';
+        ctx.beginPath(); ctx.ellipse(9, -28 + bob, 4, eyeH, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(17, -28 + bob, 4, eyeH, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.ellipse(9, -28 + bob, alert ? 1 : 2, eyeH * 0.8, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(17, -28 + bob, alert ? 1 : 2, eyeH * 0.8, 0, 0, Math.PI * 2); ctx.fill();
+        // angry brow when alert
+        if (alert) {
+            ctx.strokeStyle = '#334455';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(5, -33 + bob); ctx.lineTo(13, -31 + bob); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(21, -31 + bob); ctx.lineTo(13, -33 + bob); ctx.stroke();
+        }
+
+        // nose + whiskers
+        ctx.fillStyle = '#FFAABB';
+        ctx.beginPath(); ctx.arc(21, -24 + bob, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 0.8;
+        [-1, 0, 1].forEach(row => {
+            ctx.beginPath(); ctx.moveTo(19, -24 + row * 4 + bob); ctx.lineTo(4, -24 + row * 5 + bob); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(23, -24 + row * 4 + bob); ctx.lineTo(34, -24 + row * 5 + bob); ctx.stroke();
+        });
+
+        // hiss speech bubble when alert
+        if (alert) {
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.ellipse(28, -44 + bob, 18, 10, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = '#CC3333'; ctx.lineWidth = 1.5; ctx.stroke();
+            ctx.fillStyle = '#CC3333';
+            ctx.font = 'bold 8px Impact';
+            ctx.textAlign = 'center';
+            ctx.fillText('HSSSS!', 28, -42 + bob);
+        }
+
+        // legs
+        const legSwing = alert ? Math.sin(t * 7) * 12 : 0;
+        [[-7, 0], [7, 0]].forEach(([bx], i) => {
+            ctx.save();
+            ctx.translate(bx, -8 + bob);
+            ctx.rotate(((i === 0 ? legSwing : -legSwing) * Math.PI) / 180);
+            ctx.fillStyle = '#8899AA';
+            ctx.beginPath(); ctx.roundRect(-3, 0, 6, 10, 3); ctx.fill();
+            ctx.strokeStyle = '#556677'; ctx.lineWidth = 1.2; ctx.stroke();
+            ctx.restore();
+        });
+
+        ctx.restore();
+    },
+
+    /* ── FAT CAT BOSS (Don Whiskers) — drawn in window frame ── */
+    fatCatBoss(ctx, cx, cy, facing, frame, phase) {
+        const t = frame * 0.05;
+        ctx.save();
+        ctx.translate(cx, cy);
+        // Boss always faces the player (handled by caller), default left-facing
+        if (facing > 0) ctx.scale(-1, 1);
+
+        // ── House wall section ──
+        ctx.fillStyle = '#D4B896';
+        ctx.fillRect(-55, -168, 110, 172);
+        // brick rows
+        ctx.strokeStyle = '#B09070';
+        ctx.lineWidth = 0.8;
+        for (let row = 0; row < 6; row++) {
+            const off = row % 2 === 0 ? 0 : 19;
+            for (let col = -2; col < 4; col++) {
+                ctx.strokeRect(-56 + col * 37 + off, -168 + row * 28, 37, 28);
+            }
+        }
+
+        // ── Window outer frame ──
+        ctx.fillStyle = '#EDE0C8';
+        ctx.strokeStyle = '#8B6914';
+        ctx.lineWidth = 5;
+        U.roundRect(ctx, -46, -158, 92, 126, 4);
+        ctx.fill(); ctx.stroke();
+
+        // ── Interior (draw cat inside clipped area) ──
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(-44, -156, 88, 122);
+        ctx.clip();
+
+        ctx.fillStyle = '#6B5A44';
+        ctx.fillRect(-44, -156, 88, 122);
+        // wallpaper pattern (elegant stripes)
+        ctx.strokeStyle = '#5A4A36';
+        ctx.lineWidth = 6;
+        for (let wx = -44; wx < 44; wx += 14) {
+            ctx.beginPath(); ctx.moveTo(wx, -156); ctx.lineTo(wx, -34); ctx.stroke();
+        }
+
+        const bodyBob = Math.sin(t * 3) * 2;
+
+        // ── Fat cat body ──
+        ctx.beginPath();
+        ctx.ellipse(0, -66 + bodyBob, 34, 30, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFF4DC';
+        ctx.fill();
+        ctx.strokeStyle = '#D4AA64';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // fat rolls / chins
+        ctx.strokeStyle = '#E8CC8C';
+        ctx.lineWidth = 1.8;
+        ctx.beginPath(); ctx.arc(0, -58 + bodyBob, 24, 0.2, Math.PI - 0.2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, -50 + bodyBob, 18, 0.3, Math.PI - 0.3); ctx.stroke();
+
+        // ── Mob-boss bow tie ──
+        const bty = -86 + bodyBob;
+        ctx.fillStyle = '#CC0000';
+        ctx.beginPath(); ctx.moveTo(-10, bty - 5); ctx.lineTo(0, bty); ctx.lineTo(-10, bty + 5); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(10, bty - 5); ctx.lineTo(0, bty); ctx.lineTo(10, bty + 5); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#990000';
+        ctx.beginPath(); ctx.arc(0, bty, 3.5, 0, Math.PI * 2); ctx.fill();
+
+        // ── Head (very round, double-chinned) ──
+        ctx.beginPath();
+        ctx.arc(0, -108 + bodyBob, 30, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFF4DC';
+        ctx.fill();
+        ctx.strokeStyle = '#D4AA64';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // double chin
+        ctx.beginPath();
+        ctx.ellipse(0, -82 + bodyBob, 22, 12, 0, 0, Math.PI);
+        ctx.fillStyle = '#FFF4DC';
+        ctx.fill();
+
+        // ── Ears ──
+        [[-22, -1], [22, 1]].forEach(([ex, dir]) => {
+            ctx.fillStyle = '#FFF4DC';
+            ctx.strokeStyle = '#D4AA64';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(ex, -124 + bodyBob);
+            ctx.lineTo(ex + dir * 16, -148 + bodyBob);
+            ctx.lineTo(ex + dir * 10, -124 + bodyBob);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#FFBBCC';
+            ctx.beginPath();
+            ctx.moveTo(ex + dir * 2, -126 + bodyBob);
+            ctx.lineTo(ex + dir * 12, -143 + bodyBob);
+            ctx.lineTo(ex + dir * 8, -126 + bodyBob);
+            ctx.closePath(); ctx.fill();
+        });
+
+        // ── Eyes (golden, menacing, half-lidded) ──
+        const eyeH = phase >= 2 ? 3 : 5;
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath(); ctx.ellipse(-12, -110 + bodyBob, 8, eyeH, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(12, -110 + bodyBob, 8, eyeH, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.ellipse(-12, -110 + bodyBob, phase >= 1 ? 1 : 3, eyeH * 0.75, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(12, -110 + bodyBob, phase >= 1 ? 1 : 3, eyeH * 0.75, 0, 0, Math.PI * 2); ctx.fill();
+        // heavy upper lids (menacing)
+        ctx.fillStyle = '#D4AA64';
+        ctx.beginPath(); ctx.ellipse(-12, -114 + bodyBob, 9, 4, 0, Math.PI, 0); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(12, -114 + bodyBob, 9, 4, 0, Math.PI, 0); ctx.fill();
+
+        // ── Nose ──
+        ctx.fillStyle = '#FFAAAA';
+        ctx.beginPath(); ctx.arc(0, -103 + bodyBob, 5, 0, Math.PI * 2); ctx.fill();
+
+        // ── Whiskers (long, elegant) ──
+        ctx.strokeStyle = '#eee';
+        ctx.lineWidth = 1;
+        [-5, 0, 5].forEach(dy => {
+            ctx.beginPath(); ctx.moveTo(-4, -103 + dy + bodyBob); ctx.lineTo(-38, -103 + dy * 1.5 + bodyBob); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(4, -103 + dy + bodyBob); ctx.lineTo(38, -103 + dy * 1.5 + bodyBob); ctx.stroke();
+        });
+
+        // ── Smug expression ──
+        ctx.beginPath();
+        ctx.arc(0, -96 + bodyBob, 10, 0.15, Math.PI - 0.15);
+        ctx.strokeStyle = '#A07848';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // ── Directing paw (phase 0: casual point; phase 1+: emphatic; phase 2: claws out) ──
+        const pawSwing = Math.sin(t * 2.5) * (phase >= 1 ? 20 : 10) - 10;
+        ctx.save();
+        ctx.translate(-32, -72 + bodyBob);
+        ctx.rotate((pawSwing * Math.PI) / 180);
+        ctx.fillStyle = '#FFF4DC';
+        ctx.strokeStyle = '#D4AA64';
+        ctx.lineWidth = 1.5;
+        // arm
+        ctx.beginPath(); ctx.roundRect(-5, 0, 10, 20, 5); ctx.fill(); ctx.stroke();
+        // paw
+        ctx.beginPath(); ctx.arc(-1, 24, 9, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // claws (always visible on the boss - just extended further in phase 2)
+        const clawLen = phase >= 2 ? 14 : 7;
+        ctx.strokeStyle = '#999';
+        ctx.lineWidth = 1.2;
+        for (let c = 0; c < 4; c++) {
+            const ang = ((c / 3.5) - 0.5) * Math.PI * 0.9;
+            ctx.beginPath();
+            ctx.moveTo(-1 + Math.cos(ang) * 7, 24 + Math.sin(ang) * 7);
+            ctx.lineTo(-1 + Math.cos(ang) * (7 + clawLen), 24 + Math.sin(ang) * (7 + clawLen));
+            ctx.stroke();
+        }
+        ctx.restore();
+
+        // ── Speech bubble (directing cats) ──
+        if (phase >= 0) {
+            const phrases = [['GET HIM!', 'BOYS GO!'], ['SURROUND', 'HIM NOW!'], ['DESTROY', 'THAT DOG!']];
+            const p = phrases[Math.min(phase, 2)];
+            const bubbleVisible = Math.floor(t * 20) % 60 < 40;
+            if (bubbleVisible) {
+                ctx.fillStyle = '#fff';
+                ctx.beginPath(); ctx.ellipse(36, -140 + bodyBob, 28, 18, 0.1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#CC0000'; ctx.lineWidth = 2; ctx.stroke();
+                ctx.fillStyle = '#CC0000';
+                ctx.font = 'bold 7px Impact';
+                ctx.textAlign = 'center';
+                ctx.fillText(p[0], 36, -145 + bodyBob);
+                ctx.fillText(p[1], 36, -135 + bodyBob);
+            }
+        }
+
+        ctx.restore(); // end interior clip
+
+        // ── Window screen mesh ──
+        if (phase < 2) {
+            // intact screen
+            ctx.save();
+            ctx.globalAlpha = 0.22;
+            ctx.strokeStyle = '#667';
+            ctx.lineWidth = 0.7;
+            for (let gx = -44; gx <= 44; gx += 9) {
+                ctx.beginPath(); ctx.moveTo(gx, -156); ctx.lineTo(gx, -34); ctx.stroke();
+            }
+            for (let gy = -156; gy <= -34; gy += 9) {
+                ctx.beginPath(); ctx.moveTo(-44, gy); ctx.lineTo(44, gy); ctx.stroke();
+            }
+            ctx.restore();
+        } else {
+            // torn screen — ragged strips hanging down
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            ctx.strokeStyle = '#889';
+            ctx.lineWidth = 0.8;
+            const tears = [-38, -22, -6, 10, 26, 40];
+            tears.forEach((gx, i) => {
+                const tearY = -156 + 20 + (i % 3) * 15;
+                ctx.beginPath(); ctx.moveTo(gx, -156); ctx.lineTo(gx + U.rnd(-4, 4), tearY); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(gx, tearY); ctx.lineTo(gx + U.rnd(-6, 6), tearY + 35 + (i % 2) * 20); ctx.stroke();
+            });
+            ctx.restore();
+            // red eyes glow through torn screen in phase 2
+            ctx.save();
+            ctx.globalAlpha = 0.5;
+            ctx.shadowColor = '#FF0000';
+            ctx.shadowBlur = 20;
+            ctx.fillStyle = '#FF0000';
+            ctx.beginPath(); ctx.arc(-12, -110 + Math.sin(t * 3) * 2, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(12, -110 + Math.sin(t * 3) * 2, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+        }
+
+        // ── Window cross-bars ──
+        ctx.fillStyle = '#8B6914';
+        ctx.fillRect(-4, -156, 8, 122);     // vertical divider
+        ctx.fillRect(-44, -100, 88, 8);     // horizontal divider
+
+        // ── Window sill & nameplate ──
+        ctx.fillStyle = '#A07848';
+        U.roundRect(ctx, -52, -34, 104, 14, 3);
+        ctx.fill();
+        ctx.strokeStyle = '#7A5828';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 7px Impact';
+        ctx.textAlign = 'center';
+        ctx.fillText('DON WHISKERS', 0, -24);
+
+        // ── Phase 2: paw swiping through torn screen ──
+        if (phase >= 2 && Math.sin(t * 4) > 0.3) {
+            const swipeX = Math.sin(t * 4) * 20 - 30;
+            ctx.save();
+            ctx.translate(swipeX, -70);
+            ctx.fillStyle = '#FFF4DC';
+            ctx.strokeStyle = '#D4AA64';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = '#888';
+            ctx.lineWidth = 1.5;
+            for (let c = 0; c < 5; c++) {
+                const ang = ((c / 4.5) - 0.5) * Math.PI;
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(ang) * 11, Math.sin(ang) * 11);
+                ctx.lineTo(Math.cos(ang) * 22, Math.sin(ang) * 22);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        ctx.restore();
+    },
+
     /* ── SMALL DOG ENEMY ── */
     smallDog(ctx, cx, cy, facing, frame, alertLevel = 0) {
         ctx.save();

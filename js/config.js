@@ -51,15 +51,15 @@ const CFG = {
         {
             id: 3,
             name: 'The Neighborhood',
-            subtitle: 'Yards & Hazards',
+            subtitle: 'Turf of the Paw',
             timeLabel: '9:00 AM',
             skyTop: '#4A90D9',
             skyBottom: '#C8E8FF',
             groundColor: '#4a7c2f',
             accentColor: '#228B22',
             width: 3400,
-            bossName: 'Mr. Grumpy',
-            bossType: 'nosyNeighbor',
+            bossName: 'Don Whiskers',
+            bossType: 'fatCatBoss',
             ambientLight: 1.0
         },
         {

@@ -1,7 +1,7 @@
 'use strict';
 
 const Storage = (() => {
-    const KEY = 'awv_highscores_v1';
+    const KEY = 'gb_highscores_v1';
     const MAX = 10;
 
     function load() {

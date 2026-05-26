@@ -431,17 +431,13 @@ const Game = (() => {
 
         /* ── Title text ── */
         // main title
-        U.drawText(ctx, 'AMERICAN', CFG.W / 2, 68, {
-            size: 74, font: 'Impact, sans-serif',
+        U.drawText(ctx, 'GOLDEN', CFG.W / 2, 82, {
+            size: 88, font: 'Impact, sans-serif',
             color: '#FFD700', outline: '#000', outlineW: 8, shadow: true
         });
-        U.drawText(ctx, 'WEEKEND', CFG.W / 2, 148, {
-            size: 74, font: 'Impact, sans-serif',
+        U.drawText(ctx, 'BISCUIT', CFG.W / 2, 194, {
+            size: 88, font: 'Impact, sans-serif',
             color: '#FF6B35', outline: '#000', outlineW: 8, shadow: true
-        });
-        U.drawText(ctx, 'VACATION', CFG.W / 2, 228, {
-            size: 74, font: 'Impact, sans-serif',
-            color: '#FF4488', outline: '#000', outlineW: 8, shadow: true
         });
 
         // subtitle flicker

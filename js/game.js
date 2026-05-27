@@ -256,8 +256,8 @@ const Game = (() => {
     /* ── Paused ── */
     function updatePaused() {
         const items = 3; // RESUME, RESTART, QUIT
-        if (input.wasPressed(['ArrowDown'])) pauseMenuIndex = (pauseMenuIndex + 1) % items;
-        if (input.wasPressed(['ArrowUp']))   pauseMenuIndex = (pauseMenuIndex - 1 + items) % items;
+        if (input.wasPressed(['ArrowDown', 's', 'S'])) pauseMenuIndex = (pauseMenuIndex + 1) % items;
+        if (input.wasPressed(['ArrowUp',   'w', 'W'])) pauseMenuIndex = (pauseMenuIndex - 1 + items) % items;
         if (input.wasPressed(CFG.KEYS.ESCAPE)) { state = 'PLAYING'; return; }
         if (input.wasPressed(CFG.KEYS.CONFIRM)) {
             if (pauseMenuIndex === 0) { state = 'PLAYING'; }
@@ -771,22 +771,118 @@ const Game = (() => {
     /* ── Pause overlay ── */
     function renderPause() {
         ctx.save();
-        ctx.fillStyle = 'rgba(0,0,0,0.65)';
+        ctx.fillStyle = 'rgba(0,0,0,0.72)';
         ctx.fillRect(0, 0, CFG.W, CFG.H);
 
-        U.drawText(ctx, 'PAUSED', CFG.W / 2, 180, {
-            size: 64, color: '#FFD700', outline: '#000', outlineW: 8, shadow: true
+        // ── Banner ──
+        U.drawText(ctx, 'PAUSED', CFG.W / 2, 60, {
+            size: 52, color: '#FFD700', outline: '#000', outlineW: 8, shadow: true
         });
-        ['RESUME','RESTART LEVEL','QUIT TO TITLE'].forEach((item, i) => {
+        ctx.strokeStyle = 'rgba(255,215,0,0.28)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(40, 92); ctx.lineTo(CFG.W - 40, 92); ctx.stroke();
+
+        // ── Vertical column divider ──
+        ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(CFG.W / 2, 102); ctx.lineTo(CFG.W / 2, CFG.H - 38); ctx.stroke();
+
+        // ─────────────── LEFT — MENU ───────────────
+        const menuCX = CFG.W / 4; // 240
+
+        U.drawText(ctx, '— MENU —', menuCX, 116, { size: 12, color: '#555' });
+
+        const menuItems = ['RESUME', 'RESTART LEVEL', 'QUIT TO TITLE'];
+        menuItems.forEach((item, i) => {
             const sel = pauseMenuIndex === i;
-            U.drawText(ctx, item, CFG.W / 2, 290 + i * 50, {
-                size: sel ? 30 : 24, color: sel ? '#FFD700' : '#ccc',
+            const iy  = 190 + i * 72;
+            if (sel) {
+                ctx.fillStyle = 'rgba(255,215,0,0.13)';
+                U.roundRect(ctx, menuCX - 145, iy - 26, 290, 52, 8);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,215,0,0.35)';
+                ctx.lineWidth = 1.5;
+                U.roundRect(ctx, menuCX - 145, iy - 26, 290, 52, 8);
+                ctx.stroke();
+            }
+            U.drawText(ctx, sel ? `▶  ${item}` : item, menuCX, iy, {
+                size: sel ? 26 : 21,
+                color: sel ? '#FFD700' : '#bbb',
                 outline: '#000', outlineW: 3
             });
         });
-        U.drawText(ctx, 'ESC to resume', CFG.W / 2, CFG.H - 30, {
-            size: 14, color: '#666'
+
+        U.drawText(ctx, '↑ ↓ / W S  navigate', menuCX, CFG.H - 52, { size: 11, color: '#555' });
+        U.drawText(ctx, 'Enter  select  •  Esc  resume', menuCX, CFG.H - 32, { size: 11, color: '#555' });
+
+        // ─────────────── RIGHT — CONTROLS ───────────────
+        const ctrlCX = CFG.W * 3 / 4; // 720
+        const cardX  = ctrlCX - 192;  // 528
+        const cardW  = 384;
+        const cardY  = 102;
+        const cardH  = CFG.H - cardY - 38; // 400
+
+        ctx.fillStyle = 'rgba(255,255,255,0.04)';
+        U.roundRect(ctx, cardX, cardY, cardW, cardH, 10);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,0.09)';
+        ctx.lineWidth = 1;
+        U.roundRect(ctx, cardX, cardY, cardW, cardH, 10);
+        ctx.stroke();
+
+        U.drawText(ctx, '— CONTROLS —', ctrlCX, 116, { size: 12, color: '#555' });
+
+        // inner column divider (action | key)
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(ctrlCX, cardY + 24); ctx.lineTo(ctrlCX, cardY + cardH - 22); ctx.stroke();
+
+        // [action, keys, isUpgrade?]
+        const rows = [
+            ['Move',        '← →  /  A  D'],
+            ['Jump',        '↑  /  W  /  Space'],
+            ['Roll & Duck', '↓  /  S'],
+            ['Attack',      'E'],
+            ['Sprint',      'Shift',      true],
+            ['Double Jump', 'Space  ×2',  true],
+            ['Pause',       'Esc'],
+        ];
+
+        const rowStart = cardY + 32;
+        const rowGap   = (cardH - 56) / rows.length;
+
+        rows.forEach(([action, keys, isUpgrade], i) => {
+            const ry = rowStart + i * rowGap + rowGap / 2;
+
+            // action label — right-aligned into left half
+            U.drawText(ctx, action, ctrlCX - 14, ry, {
+                size: 13, color: isUpgrade ? '#998855' : '#cccccc',
+                align: 'right', baseline: 'middle'
+            });
+
+            // key badge — left half of right sub-column
+            const badgeW = 148, badgeH = 22;
+            const badgeX = ctrlCX + 10;
+            const badgeY = ry - badgeH / 2;
+            ctx.fillStyle = 'rgba(255,255,255,0.08)';
+            U.roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
+            ctx.fill();
+            ctx.strokeStyle = isUpgrade ? 'rgba(255,215,0,0.25)' : 'rgba(255,255,255,0.16)';
+            ctx.lineWidth = 1;
+            U.roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 4);
+            ctx.stroke();
+            U.drawText(ctx, keys, badgeX + badgeW / 2, ry, {
+                size: 12,
+                color: isUpgrade ? '#FFD700' : '#00DDFF',
+                align: 'center', baseline: 'middle'
+            });
         });
+
+        // footnote
+        U.drawText(ctx, '★ sprint & double jump unlock via upgrades', ctrlCX, cardY + cardH - 12, {
+            size: 11, color: '#555', baseline: 'middle'
+        });
+
         ctx.restore();
     }
 

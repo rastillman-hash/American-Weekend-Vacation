@@ -19,6 +19,7 @@ class Player {
         this._jumpCount = 0;
         this._rollTimer = 0;
         this._attackTimer = 0;
+        this._attackBuffer = 0; // queued attack input
         this._invincibleTimer = 0;
         this._sprintTimer = 0;
         this._sprintCooldown = 0;
@@ -101,7 +102,19 @@ class Player {
 
         // ── Attack ──
         if (input.wasPressed(CFG.KEYS.ATTACK) && !rolling) {
-            this._attackTimer = CFG.ATTACK_DURATION;
+            if (this._attackTimer > 0) {
+                this._attackBuffer = 10; // buffer for up to 10 frames
+            } else {
+                this._attackTimer = CFG.ATTACK_DURATION;
+            }
+        }
+        // consume buffer the moment the current attack ends
+        if (this._attackBuffer > 0) {
+            this._attackBuffer--;
+            if (this._attackTimer <= 0) {
+                this._attackTimer = CFG.ATTACK_DURATION;
+                this._attackBuffer = 0;
+            }
         }
 
         // ── Gravity ──
@@ -192,6 +205,7 @@ class Player {
         this._jumpCount = 0;
         this._rollTimer = 0;
         this._attackTimer = 0;
+        this._attackBuffer = 0;
         this._invincibleTimer = 0;
         this.state = 'idle';
         this.onGround = false;

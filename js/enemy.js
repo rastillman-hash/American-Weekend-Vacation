@@ -224,26 +224,33 @@ class TeenWorker extends Enemy {
     }
 
     renderBossHUD(ctx) {
-        const bw = 400, bh = 24;
-        const bx = (CFG.W - bw) / 2, by = CFG.H - 50;
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        U.roundRect(ctx, bx - 10, by - 30, bw + 20, bh + 40, 8);
-        ctx.fill();
-        U.drawText(ctx, 'TYLER THE TEEN', CFG.W / 2, by - 12, { size: 16, color: '#FF6B00', outline: '#000', outlineW: 3 });
+        // ── Slim bottom banner (clears upgrade icons at top-left) ──
+        const stripH = 38;
+        const stripY = CFG.H - stripH;
+        ctx.fillStyle = 'rgba(0,0,0,0.82)';
+        ctx.fillRect(0, stripY, CFG.W, stripH);
+        ctx.fillStyle = '#FF6B00';
+        ctx.fillRect(0, stripY, CFG.W, 2); // top accent line
+
+        // boss name — left side
+        U.drawText(ctx, 'TYLER THE TEEN', 12, stripY + 14, {
+            size: 13, color: '#FF6B00', outline: '#000', outlineW: 2,
+            align: 'left', baseline: 'middle'
+        });
+
+        // health bar — center
+        const barX = 190, barW = CFG.W - 380, barH = 14, barY = stripY + 12;
         ctx.fillStyle = '#400';
-        U.roundRect(ctx, bx, by, bw, bh, 4);
-        ctx.fill();
+        U.roundRect(ctx, barX, barY, barW, barH, 3); ctx.fill();
         ctx.fillStyle = '#FF4400';
-        U.roundRect(ctx, bx, by, bw * (this.health / this.maxHealth), bh, 4);
-        ctx.fill();
-        ctx.strokeStyle = '#FF8800';
-        ctx.lineWidth = 2;
-        U.roundRect(ctx, bx, by, bw, bh, 4);
-        ctx.stroke();
-        // phase stars
+        U.roundRect(ctx, barX, barY, barW * (this.health / this.maxHealth), barH, 3); ctx.fill();
+        ctx.strokeStyle = '#FF8800'; ctx.lineWidth = 1.5;
+        U.roundRect(ctx, barX, barY, barW, barH, 3); ctx.stroke();
+
+        // phase stars — right side
         for (let i = 0; i < 3; i++) {
-            const filled = i <= this._phase;
-            U.drawStar(ctx, bx + bw + 20 + i * 22, by + 12, 5, 9, 4, filled ? '#FFD700' : '#444');
+            U.drawStar(ctx, CFG.W - 62 + i * 20, stripY + 19, 4, 8, 3,
+                i <= this._phase ? '#FFD700' : '#444');
         }
     }
 }
@@ -332,21 +339,24 @@ class AnimalControl extends Enemy {
     }
 
     renderBossHUD(ctx) {
-        const bw = 400, bh = 24;
-        const bx = (CFG.W - bw) / 2, by = CFG.H - 50;
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        U.roundRect(ctx, bx - 10, by - 30, bw + 20, bh + 40, 8);
-        ctx.fill();
-        U.drawText(ctx, 'OFFICER WOOFCATCHER', CFG.W / 2, by - 12, { size: 16, color: '#4488FF', outline: '#000', outlineW: 3 });
-        ctx.fillStyle = '#001a4d';
-        U.roundRect(ctx, bx, by, bw, bh, 4);
-        ctx.fill();
+        const stripH = 38, stripY = CFG.H - stripH;
+        ctx.fillStyle = 'rgba(0,0,0,0.82)';
+        ctx.fillRect(0, stripY, CFG.W, stripH);
         ctx.fillStyle = '#4488FF';
-        U.roundRect(ctx, bx, by, bw * (this.health / this.maxHealth), bh, 4);
-        ctx.fill();
-        ctx.strokeStyle = '#88AAFF'; ctx.lineWidth = 2;
-        U.roundRect(ctx, bx, by, bw, bh, 4);
-        ctx.stroke();
+        ctx.fillRect(0, stripY, CFG.W, 2);
+
+        U.drawText(ctx, 'OFFICER WOOFCATCHER', 12, stripY + 14, {
+            size: 13, color: '#4488FF', outline: '#000', outlineW: 2,
+            align: 'left', baseline: 'middle'
+        });
+
+        const barX = 230, barW = CFG.W - 310, barH = 14, barY = stripY + 12;
+        ctx.fillStyle = '#001a4d';
+        U.roundRect(ctx, barX, barY, barW, barH, 3); ctx.fill();
+        ctx.fillStyle = '#4488FF';
+        U.roundRect(ctx, barX, barY, barW * (this.health / this.maxHealth), barH, 3); ctx.fill();
+        ctx.strokeStyle = '#88AAFF'; ctx.lineWidth = 1.5;
+        U.roundRect(ctx, barX, barY, barW, barH, 3); ctx.stroke();
     }
 }
 
@@ -410,23 +420,31 @@ class GenericBoss extends Enemy {
 
     renderBossHUD(ctx) {
         const cfg = CFG.LEVELS[this.levelId - 1];
-        const bw = 400, bh = 24;
-        const bx = (CFG.W - bw) / 2, by = CFG.H - 50;
         const c = this._colors[(this.levelId - 1) % this._colors.length];
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        U.roundRect(ctx, bx - 10, by - 30, bw + 20, bh + 40, 8);
-        ctx.fill();
-        U.drawText(ctx, cfg ? cfg.bossName.toUpperCase() : 'BOSS', CFG.W / 2, by - 12,
-            { size: 16, color: c, outline: '#000', outlineW: 3 });
-        ctx.fillStyle = '#222';
-        U.roundRect(ctx, bx, by, bw, bh, 4);
-        ctx.fill();
+        const name = cfg ? cfg.bossName.toUpperCase() : 'BOSS';
+        const stripH = 38, stripY = CFG.H - stripH;
+        ctx.fillStyle = 'rgba(0,0,0,0.82)';
+        ctx.fillRect(0, stripY, CFG.W, stripH);
         ctx.fillStyle = c;
-        U.roundRect(ctx, bx, by, bw * (this.health / this.maxHealth), bh, 4);
-        ctx.fill();
-        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2;
-        U.roundRect(ctx, bx, by, bw, bh, 4);
-        ctx.stroke();
+        ctx.fillRect(0, stripY, CFG.W, 2);
+
+        U.drawText(ctx, name, 12, stripY + 14, {
+            size: 13, color: c, outline: '#000', outlineW: 2,
+            align: 'left', baseline: 'middle'
+        });
+
+        const barX = 190, barW = CFG.W - 270, barH = 14, barY = stripY + 12;
+        ctx.fillStyle = '#222';
+        U.roundRect(ctx, barX, barY, barW, barH, 3); ctx.fill();
+        ctx.fillStyle = c;
+        U.roundRect(ctx, barX, barY, barW * (this.health / this.maxHealth), barH, 3); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5;
+        U.roundRect(ctx, barX, barY, barW, barH, 3); ctx.stroke();
+
+        for (let i = 0; i < 3; i++) {
+            U.drawStar(ctx, CFG.W - 62 + i * 20, stripY + 19, 4, 8, 3,
+                i <= this._phase ? '#FFD700' : '#444');
+        }
     }
 }
 
@@ -552,40 +570,39 @@ class FatCatBoss extends Enemy {
     }
 
     renderBossHUD(ctx) {
-        const bw = 400, bh = 24;
-        const bx = (CFG.W - bw) / 2, by = CFG.H - 50;
-
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        U.roundRect(ctx, bx - 10, by - 32, bw + 20, bh + 42, 8);
-        ctx.fill();
-
         const phaseLabel = ['Giving Orders', 'Paw Swiping', 'CLAWS OUT!'][this._phase];
-        U.drawText(ctx, `😼  DON WHISKERS — THE NEIGHBORHOOD PAW  😼`, CFG.W / 2, by - 16, {
-            size: 14, color: '#FFD700', outline: '#000', outlineW: 3
-        });
-        U.drawText(ctx, phaseLabel, CFG.W / 2, by - 2, {
-            size: 10, color: '#FF8888', outline: '#000', outlineW: 2
-        });
-
-        // health track
-        ctx.fillStyle = '#1a0800';
-        U.roundRect(ctx, bx, by + 10, bw, bh, 4);
-        ctx.fill();
         const barColor = this._phase >= 2 ? '#FF2200' : this._phase >= 1 ? '#FF8800' : '#FF6600';
-        ctx.fillStyle = barColor;
-        U.roundRect(ctx, bx, by + 10, bw * (this.health / this.maxHealth), bh, 4);
-        ctx.fill();
-        ctx.strokeStyle = '#FFD700';
-        ctx.lineWidth = 2;
-        U.roundRect(ctx, bx, by + 10, bw, bh, 4);
-        ctx.stroke();
+        const stripH = 38, stripY = CFG.H - stripH;
 
-        // phase paw-print pips
+        ctx.fillStyle = 'rgba(0,0,0,0.82)';
+        ctx.fillRect(0, stripY, CFG.W, stripH);
+        ctx.fillStyle = '#FFD700';
+        ctx.fillRect(0, stripY, CFG.W, 2);
+
+        // boss name + phase label stacked on left
+        U.drawText(ctx, '😼 DON WHISKERS', 12, stripY + 10, {
+            size: 12, color: '#FFD700', outline: '#000', outlineW: 2,
+            align: 'left', baseline: 'middle'
+        });
+        U.drawText(ctx, phaseLabel, 12, stripY + 26, {
+            size: 10, color: '#FF8888', outline: '#000', outlineW: 2,
+            align: 'left', baseline: 'middle'
+        });
+
+        // health bar — center
+        const barX = 200, barW = CFG.W - 290, barH = 14, barY = stripY + 12;
+        ctx.fillStyle = '#1a0800';
+        U.roundRect(ctx, barX, barY, barW, barH, 3); ctx.fill();
+        ctx.fillStyle = barColor;
+        U.roundRect(ctx, barX, barY, barW * (this.health / this.maxHealth), barH, 3); ctx.fill();
+        ctx.strokeStyle = '#FFD700'; ctx.lineWidth = 1.5;
+        U.roundRect(ctx, barX, barY, barW, barH, 3); ctx.stroke();
+
+        // paw pips — right side
         for (let i = 0; i < 3; i++) {
-            const filled = i <= this._phase;
-            ctx.font = '14px sans-serif';
+            ctx.font = '16px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(filled ? '🐾' : '○', bx + bw + 18 + i * 22, by + 24);
+            ctx.fillText(i <= this._phase ? '🐾' : '○', CFG.W - 68 + i * 24, stripY + 22);
         }
     }
 }
@@ -597,6 +614,8 @@ function createEnemy(type, x, y, levelId = 1) {
         case 'mediumDog':      return new MediumDog(x, y);
         case 'teenWorker':     return new TeenWorker(x, y);
         case 'animalControl':  return new AnimalControl(x, y);
+        case 'streetCat':      return new StreetCat(x, y);
+        case 'fatCatBoss':     return new FatCatBoss(x, y);
         default:               return new GenericBoss(x, y, levelId);
     }
 }

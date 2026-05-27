@@ -478,88 +478,197 @@ const Game = (() => {
     }
 
     function renderTitleMural(t) {
-        // Theme park skyline (back)
-        ctx.save();
-        ctx.globalAlpha = 0.25;
-        [
-            { x: 60,  h: 180, w: 30, c: '#FF00FF' },
-            { x: 100, h: 220, w: 20, c: '#00FFFF' },
-            { x: 820, h: 200, w: 25, c: '#FFD700' },
-            { x: 870, h: 160, w: 35, c: '#FF4488' },
-        ].forEach(b => {
-            ctx.fillStyle = b.c;
-            ctx.fillRect(b.x, CFG.H - b.h, b.w, b.h);
-        });
-        // roller coaster silhouette
-        ctx.strokeStyle = '#FF4400';
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(750, CFG.H - 80);
-        [780,810,840,870,900].forEach((x, i) => {
-            ctx.quadraticCurveTo(x - 15, CFG.H - 100 - (i % 2) * 80, x, CFG.H - 80);
-        });
-        ctx.stroke();
-        ctx.restore();
+        /* ── 80s retro nighttime panorama — silhouettes of all 7 levels ──
+           No level names in the art. Pure neon-on-dark silhouette storytelling. */
+        const G = CFG.H - 8; // ground line y
 
-        // day care building (left)
-        ctx.save();
-        ctx.globalAlpha = 0.3;
-        ctx.fillStyle = '#FF6B00';
-        ctx.fillRect(20, CFG.H - 260, 140, 260);
-        ctx.fillStyle = '#D4AA00';
-        ctx.font = 'bold 14px Impact';
-        ctx.textAlign = 'center';
-        ctx.fillText('HAPPY PAWS', 90, CFG.H - 220);
-        ctx.fillText('DAY CARE', 90, CFG.H - 200);
-        ctx.restore();
-
-        // street (mid-left)
-        ctx.save();
-        ctx.globalAlpha = 0.2;
-        ctx.fillStyle = '#555';
-        ctx.fillRect(160, CFG.H - 120, 200, 120);
-        // car
-        ctx.fillStyle = '#FF4444';
-        ctx.fillRect(170 + Math.sin(t * 0.02) * 10, CFG.H - 70, 60, 30);
-        ctx.fillStyle = '#333';
-        ctx.beginPath(); ctx.arc(180, CFG.H - 40, 10, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.arc(220, CFG.H - 40, 10, 0, Math.PI * 2); ctx.fill();
-        ctx.restore();
-
-        // fence
-        ctx.save();
-        ctx.globalAlpha = 0.35;
-        Sprites.fence(ctx, 370, CFG.H - 120, 130);
-        ctx.restore();
-
-        // friend dogs (right side)
-        ctx.save();
-        ctx.globalAlpha = 0.4;
-        Sprites.smallDog(ctx, 740, CFG.H - 40, 1, t, 0);
-        Sprites.mediumDog(ctx, 800, CFG.H - 40, -1, t + 20, 0);
-        ctx.restore();
-
-        // family silhouettes (far right)
-        ctx.save();
-        ctx.globalAlpha = 0.25;
-        ctx.fillStyle = '#FFD700';
-        // family of 4 silhouettes
-        [920, 945, 970, 985].forEach((x, i) => {
-            const h = i < 2 ? 60 : 45;
-            ctx.fillRect(x, CFG.H - h, 14, h);
-            ctx.beginPath(); ctx.arc(x + 7, CFG.H - h - 10, 10, 0, Math.PI * 2); ctx.fill();
-        });
-        ctx.restore();
-
-        // animated stars scattered
-        for (let i = 0; i < 30; i++) {
-            const sx = (i * 137.5) % CFG.W;
-            const sy = (i * 73.1) % (CFG.H * 0.5);
-            const alpha = 0.4 + 0.4 * Math.sin(t * 0.05 + i);
+        // ── Neon horizon glow bands ──
+        ['#FF00FF','#00FFFF','#FF4400'].forEach((nc, i) => {
             ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.fillStyle = '#fff';
-            ctx.beginPath(); ctx.arc(sx, sy, 1, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 0.04 + 0.02 * Math.sin(t * 0.04 + i * 2.1);
+            ctx.fillStyle = nc;
+            ctx.fillRect(0, i * 180, CFG.W, 180);
+            ctx.restore();
+        });
+
+        // ── Zone 1 (x 0-155): Doggy Day Care ──
+        // Main kennel building
+        ctx.fillStyle = '#12082a';
+        ctx.fillRect(0, G - 190, 130, 190);
+        // pitched roof
+        ctx.beginPath(); ctx.moveTo(-8, G - 190); ctx.lineTo(65, G - 255); ctx.lineTo(138, G - 190); ctx.closePath();
+        ctx.fillStyle = '#0d0520'; ctx.fill();
+        // neon sign frame (no text)
+        ctx.save(); ctx.shadowColor = '#FF4400'; ctx.shadowBlur = 18;
+        ctx.strokeStyle = '#FF4400'; ctx.lineWidth = 2.5;
+        ctx.strokeRect(18, G - 168, 88, 32); ctx.restore();
+        // kennel window lights
+        [[20, G-130, 28, 22],[84, G-130, 28, 22]].forEach(([wx,wy,ww,wh]) => {
+            ctx.save(); ctx.shadowColor = '#FF8800'; ctx.shadowBlur = 10;
+            ctx.fillStyle = 'rgba(255,136,0,0.28)'; ctx.fillRect(wx,wy,ww,wh); ctx.restore();
+        });
+        // dog-house silhouette (small, beside building)
+        ctx.fillStyle = '#0d0520';
+        ctx.fillRect(136, G - 55, 42, 55);
+        ctx.beginPath(); ctx.moveTo(132, G-55); ctx.lineTo(157, G-80); ctx.lineTo(182, G-55); ctx.closePath();
+        ctx.fillStyle = '#0a031a'; ctx.fill();
+        // fence row
+        ctx.fillStyle = '#100726';
+        for (let fx = 142; fx < 200; fx += 16) {
+            ctx.fillRect(fx, G - 44, 7, 44);
+            ctx.fillRect(fx - 2, G - 38, 18, 5);
+            ctx.fillRect(fx - 2, G - 24, 18, 5);
+        }
+
+        // ── Zone 2 (x 155-320): Busy Streets ──
+        [[155, G-180, 52],[200, G-230, 60],[255, G-200, 55],[308, G-170, 48]].forEach(([bx,by,bw]) => {
+            ctx.fillStyle = '#0e0624';
+            ctx.fillRect(bx, by, bw, G - by);
+            for (let wy = by + 18; wy < G - 18; wy += 26) {
+                for (let wx = bx + 7; wx < bx + bw - 12; wx += 18) {
+                    const on = Math.sin(t * 0.03 + wx * 0.08 + wy * 0.04) > 0;
+                    if (on) {
+                        ctx.save(); ctx.shadowColor = '#00FFFF'; ctx.shadowBlur = 8;
+                        ctx.fillStyle = 'rgba(0,255,255,0.25)'; ctx.fillRect(wx, wy, 10, 14); ctx.restore();
+                    }
+                }
+            }
+        });
+        // traffic light
+        ctx.fillStyle = '#111'; ctx.fillRect(318, G - 100, 5, 100);
+        const litIdx = Math.floor(t / 55) % 3;
+        ['#FF0000','#FFAA00','#00FF00'].forEach((lc, i) => {
+            ctx.save();
+            if (litIdx === i) { ctx.shadowColor = lc; ctx.shadowBlur = 16; ctx.fillStyle = lc; }
+            else { ctx.fillStyle = '#333'; }
+            ctx.beginPath(); ctx.arc(320, G - 86 + i * 16, 5, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+        });
+        // moving car silhouette
+        const carX = 160 + ((t * 0.4) % 140);
+        ctx.fillStyle = '#0a0318';
+        ctx.fillRect(carX, G - 24, 50, 16);
+        ctx.beginPath(); ctx.arc(carX + 10, G - 8, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(carX + 38, G - 8, 7, 0, Math.PI * 2); ctx.fill();
+        ctx.save(); ctx.shadowColor = '#FF4400'; ctx.shadowBlur = 10;
+        ctx.fillStyle = 'rgba(255,68,0,0.5)'; ctx.fillRect(carX, G - 20, 8, 8); ctx.restore();
+
+        // ── Zone 3 (x 320-490): Neighborhood ──
+        [[322, G-115, 74],[390, G-100, 82],[460, G-125, 68]].forEach(([hx,hy,hw]) => {
+            ctx.fillStyle = '#0d0622';
+            ctx.fillRect(hx, hy, hw, G - hy);
+            ctx.beginPath(); ctx.moveTo(hx-6, hy); ctx.lineTo(hx+hw/2, hy-38); ctx.lineTo(hx+hw+6, hy); ctx.closePath();
+            ctx.fillStyle = '#090418'; ctx.fill();
+            ctx.save(); ctx.shadowColor = '#FF00FF'; ctx.shadowBlur = 10;
+            ctx.fillStyle = 'rgba(255,0,255,0.22)';
+            ctx.fillRect(hx+hw/2-11, hy+18, 22, 18); ctx.restore();
+        });
+        // cat silhouette on fence top
+        ctx.save(); ctx.shadowColor = '#FF00FF'; ctx.shadowBlur = 8;
+        ctx.fillStyle = '#0a0318';
+        ctx.beginPath(); ctx.arc(434, G - 54, 9, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(427,G-60); ctx.lineTo(425,G-72); ctx.lineTo(433,G-63); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(435,G-63); ctx.lineTo(441,G-72); ctx.lineTo(443,G-60); ctx.closePath(); ctx.fill();
+        ctx.fillRect(428, G-45, 10, 22); ctx.restore();
+        // picket fence
+        ctx.fillStyle = '#0c0520';
+        for (let fx = 320; fx < 490; fx += 16) {
+            ctx.fillRect(fx, G - 40, 6, 40);
+            ctx.fillRect(fx - 2, G - 34, 18, 4);
+        }
+
+        // ── Zone 4 (x 490-630): City Park ──
+        [[492, G-165, 32],[540, G-185, 40],[590, G-155, 30],[630, G-175, 36]].forEach(([tx,ty,ts]) => {
+            ctx.fillStyle = '#0c0620'; ctx.fillRect(tx+ts/2-4, G-60, 8, 60);
+            ctx.beginPath(); ctx.moveTo(tx-8,G-60); ctx.lineTo(tx+ts/2,ty); ctx.lineTo(tx+ts+8,G-60); ctx.closePath();
+            ctx.fillStyle = '#08041a'; ctx.fill();
+            ctx.save(); ctx.shadowColor = '#00FF88'; ctx.shadowBlur = 8;
+            ctx.strokeStyle = 'rgba(0,255,136,0.4)'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+        });
+        // lamp post
+        ctx.fillStyle = '#111'; ctx.fillRect(562, G - 110, 5, 110); ctx.fillRect(562, G-110, 22, 5);
+        ctx.save(); ctx.shadowColor = '#FFD700'; ctx.shadowBlur = 22;
+        ctx.fillStyle = 'rgba(255,215,0,0.65)'; ctx.beginPath(); ctx.arc(572, G-108, 7, 0, Math.PI*2); ctx.fill(); ctx.restore();
+        // bench
+        ctx.fillStyle = '#0c0520'; ctx.fillRect(600, G-14, 36, 5); ctx.fillRect(603, G-14, 4, 14); ctx.fillRect(629, G-14, 4, 14);
+
+        // ── Zone 5 (x 630-780): Highway & Construction ──
+        // crane mast + boom
+        ctx.fillStyle = '#0e0824';
+        ctx.fillRect(648, G - 230, 10, 230);
+        ctx.fillRect(648, G - 230, 110, 8);
+        ctx.save(); ctx.shadowColor = '#FF8C00'; ctx.shadowBlur = 12;
+        ctx.strokeStyle = '#FF8C00'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(712, G-222); ctx.lineTo(720, G-110); ctx.stroke(); ctx.restore();
+        // cones
+        [680, 710, 742, 770].forEach(cx2 => {
+            ctx.save(); ctx.shadowColor = '#FF8C00'; ctx.shadowBlur = 6;
+            ctx.fillStyle = '#FF5500';
+            ctx.beginPath(); ctx.moveTo(cx2,G); ctx.lineTo(cx2-7,G-26); ctx.lineTo(cx2+7,G-26); ctx.closePath(); ctx.fill();
+            ctx.restore();
+        });
+        // road dashes
+        for (let rx = 635; rx < 780; rx += 28) {
+            ctx.save(); ctx.shadowColor = '#fff'; ctx.shadowBlur = 4;
+            ctx.fillStyle = 'rgba(255,255,255,0.18)'; ctx.fillRect(rx, G - 6, 16, 4); ctx.restore();
+        }
+
+        // ── Zone 6 (x 780-895): Shopping Strip ──
+        ctx.fillStyle = '#0c0622'; ctx.fillRect(780, G - 160, 72, 160);
+        ctx.fillStyle = '#0a0418'; ctx.fillRect(846, G - 180, 66, 180);
+        // neon signs (no text — pure glowing rectangles/shapes)
+        [[780, G-130, 58, 24, '#FF00FF'], [846, G-148, 52, 22, '#00FFFF']].forEach(([sx,sy,sw,sh,nc]) => {
+            ctx.save(); ctx.shadowColor = nc; ctx.shadowBlur = 20;
+            ctx.strokeStyle = nc; ctx.lineWidth = 2.5; ctx.strokeRect(sx+4, sy, sw, sh);
+            ctx.globalAlpha = 0.18; ctx.fillStyle = nc; ctx.fillRect(sx+4, sy, sw, sh);
+            ctx.restore();
+        });
+        // striped awning accent
+        ctx.save(); ctx.shadowColor = '#FFD700'; ctx.shadowBlur = 5;
+        ctx.fillStyle = '#12082a';
+        ctx.beginPath(); ctx.moveTo(780,G-100); ctx.lineTo(852,G-100); ctx.lineTo(847,G-84); ctx.lineTo(785,G-84); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,215,0,0.35)'; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+
+        // ── Zone 7 (x 895-960+): Wonderland Park ──
+        // Ferris wheel
+        ctx.save(); ctx.shadowColor = '#00FFFF'; ctx.shadowBlur = 18;
+        ctx.strokeStyle = '#00FFFF'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.arc(916, G - 188, 46, 0, Math.PI * 2); ctx.stroke();
+        for (let sp = 0; sp < 8; sp++) {
+            const ang = (sp / 8) * Math.PI * 2 + t * 0.008;
+            ctx.beginPath(); ctx.moveTo(916, G-188);
+            ctx.lineTo(916 + Math.cos(ang)*46, G-188 + Math.sin(ang)*46); ctx.stroke();
+        }
+        ctx.restore();
+        // roller coaster loop — extends right beyond edge (dramatic)
+        ctx.save(); ctx.shadowColor = '#FF00FF'; ctx.shadowBlur = 22;
+        ctx.strokeStyle = '#FF00FF'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(974, G - 105, 58, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+        // coaster track on ground
+        ctx.save(); ctx.shadowColor = '#FF00FF'; ctx.shadowBlur = 8;
+        ctx.strokeStyle = 'rgba(255,0,255,0.5)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(895, G-8); ctx.lineTo(960, G-8); ctx.stroke(); ctx.restore();
+
+        // ── Ground line — neon horizon ──
+        ctx.save(); ctx.shadowColor = '#FF00FF'; ctx.shadowBlur = 12;
+        ctx.strokeStyle = 'rgba(255,0,255,0.55)'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, G); ctx.lineTo(CFG.W, G); ctx.stroke(); ctx.restore();
+
+        // ── Scanline overlay ──
+        ctx.save(); ctx.globalAlpha = 0.10;
+        for (let sy = 0; sy < CFG.H; sy += 3) { ctx.fillStyle = '#000'; ctx.fillRect(0, sy, CFG.W, 1); }
+        ctx.restore();
+
+        // ── Floating neon stars ──
+        const neonCols = ['#FF00FF','#00FFFF','#FFD700','#FF4400','#00FF88'];
+        for (let i = 0; i < 55; i++) {
+            const sx = ((i * 134.7 + t * (i % 3 === 0 ? 0.15 : 0.08)) % CFG.W + CFG.W) % CFG.W;
+            const sy = (i * 79.3) % (CFG.H * 0.62);
+            const alpha = 0.3 + 0.5 * Math.sin(t * 0.06 + i);
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, alpha) * 0.75;
+            ctx.fillStyle = neonCols[i % neonCols.length];
+            ctx.shadowColor = neonCols[i % neonCols.length]; ctx.shadowBlur = 5;
+            ctx.beginPath(); ctx.arc(sx, sy, i % 4 === 0 ? 1.6 : 0.9, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
         }
     }
@@ -577,7 +686,7 @@ const Game = (() => {
 
         renderHUD();
 
-        if (level.boss && !level.boss.dead) {
+        if (level.boss && !level.boss.dead && level._bossRevealed) {
             level.renderBossHUD(ctx);
         }
     }
@@ -618,44 +727,45 @@ const Game = (() => {
             size: 11, color: '#FFD700', outline: '#000', outlineW: 2, baseline: 'top'
         });
 
-        // sprint cooldown indicator
+        // upgrades panel — top-left, below health bar
+        const upgs = CFG.UPGRADES.filter(u => player.upgrades[u.id]);
+        upgs.forEach((u, i) => {
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            U.roundRect(ctx, 14 + i * 34, 50, 28, 28, 5);
+            ctx.fill();
+            ctx.strokeStyle = u.color;
+            ctx.lineWidth = 1.5;
+            U.roundRect(ctx, 14 + i * 34, 50, 28, 28, 5);
+            ctx.stroke();
+            ctx.font = '15px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#fff';
+            ctx.fillText(u.icon, 28 + i * 34, 69);
+        });
+
+        // sprint cooldown indicator — below upgrade icons
         if (player.upgrades.sprint) {
             const scPct = player.sprintCooldownPct;
+            const barTop = upgs.length > 0 ? 84 : 50;
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            U.roundRect(ctx, 14, 50, 100, 12, 4);
+            U.roundRect(ctx, 14, barTop, 100, 10, 3);
             ctx.fill();
             ctx.fillStyle = scPct >= 1 ? '#00DDFF' : '#225566';
-            U.roundRect(ctx, 14, 50, 100 * scPct, 12, 4);
+            U.roundRect(ctx, 14, barTop, 100 * scPct, 10, 3);
             ctx.fill();
-            U.drawText(ctx, 'SPRINT', 64, 57, { size: 9, color: '#fff' });
+            U.drawText(ctx, 'SPRINT', 64, barTop + 5, { size: 8, color: '#fff' });
         }
 
-        // golden run indicator
+        // golden run indicator — bottom center (safe — boss banner is bottom-right weighted)
         if (isGoldenRun) {
             const glow = 0.7 + 0.3 * Math.sin(frame * 0.1);
             ctx.save();
             ctx.globalAlpha = glow;
-            U.drawText(ctx, '✨ GOLDEN RUN', CFG.W / 2, CFG.H - 20, {
-                size: 16, color: '#FFD700', outline: '#000', outlineW: 3
+            U.drawText(ctx, '✨ GOLDEN RUN', CFG.W / 2, CFG.H - 46, {
+                size: 15, color: '#FFD700', outline: '#000', outlineW: 3
             });
             ctx.restore();
         }
-
-        // upgrades panel (small icons bottom-left)
-        const upgs = CFG.UPGRADES.filter(u => player.upgrades[u.id]);
-        upgs.forEach((u, i) => {
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            U.roundRect(ctx, 14 + i * 36, CFG.H - 46, 30, 30, 6);
-            ctx.fill();
-            ctx.strokeStyle = u.color;
-            ctx.lineWidth = 2;
-            U.roundRect(ctx, 14 + i * 36, CFG.H - 46, 30, 30, 6);
-            ctx.stroke();
-            ctx.font = '18px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillStyle = '#fff';
-            ctx.fillText(u.icon, 29 + i * 36, CFG.H - 27);
-        });
     }
 
     /* ── Pause overlay ── */

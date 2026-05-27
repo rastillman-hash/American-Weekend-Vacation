@@ -42,9 +42,12 @@ Complete all 7 levels to earn the **Golden Peanut Butter Biscuit** — then repl
 | Roll / Duck | `↓` Arrow &nbsp;or&nbsp; `S` |
 | **Attack** (Bite / Chomp / Shred) | **`E`** |
 | Sprint Burst *(upgrade required)* | `Shift` |
-| Pause | `Escape` |
-| Navigate menus | `↑ ↓` Arrow Keys |
+| Double Jump *(upgrade required)* | `Space` × 2 *(press again mid-air)* |
+| Pause / Unpause | `Escape` |
+| Navigate menus | `↑ ↓` Arrow Keys &nbsp;or&nbsp; `W` / `S` |
 | Confirm / Select | `Enter` &nbsp;or&nbsp; `Space` |
+
+> **💡 Tip — Controls at a glance:** Press **`Esc`** to pause at any time. The pause screen shows a full controls reference card on the right side so you never have to leave the game to look up a key binding.
 
 ---
 

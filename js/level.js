@@ -301,6 +301,7 @@ class Level {
         this._frame = 0;
         this._boss = undefined; // cached by getter
         this._skyGradient = null; // cached per level
+        this._bossRevealed = false; // true once boss enters the camera viewport
 
         // scale damage / speed with level depth
         this.levelScale = 1 + (id - 1) * 0.15;
@@ -560,7 +561,10 @@ class Level {
         this.enemies.forEach(e => {
             if (e.dead) return;
             const ex = e.cx - camX;
-            if (ex > -100 && ex < CFG.W + 100) e.render(ctx, camX);
+            if (ex > -100 && ex < CFG.W + 100) {
+                e.render(ctx, camX);
+                if (e.isBoss) this._bossRevealed = true; // latch on first sight
+            }
         });
     }
 

@@ -357,13 +357,19 @@ const Sprites = {
         ctx.restore();
     },
 
-    /* ── FAT CAT BOSS (Don Whiskers) — drawn in window frame ── */
+    /* ── FAT CAT BOSS (Don Whiskers) — ginger tabby mob boss in window ── */
     fatCatBoss(ctx, cx, cy, facing, frame, phase) {
         const t = frame * 0.05;
         ctx.save();
         ctx.translate(cx, cy);
         // Boss always faces the player (handled by caller), default left-facing
         if (facing > 0) ctx.scale(-1, 1);
+
+        // Ginger tabby colour palette
+        const catBase   = '#D4783A';   // warm ginger-orange
+        const catStripe = '#A85020';   // darker stripe / outline
+        const catLight  = '#F0A864';   // lighter chin / belly
+        const catPink   = '#FF8888';   // inner ear / nose
 
         // ── House wall section ──
         ctx.fillStyle = '#D4B896';
@@ -385,157 +391,228 @@ const Sprites = {
         U.roundRect(ctx, -46, -158, 92, 126, 4);
         ctx.fill(); ctx.stroke();
 
-        // ── Interior (draw cat inside clipped area) ──
+        // ── Interior clipped area ──
         ctx.save();
         ctx.beginPath();
         ctx.rect(-44, -156, 88, 122);
         ctx.clip();
 
-        ctx.fillStyle = '#6B5A44';
+        // Dark room wallpaper
+        ctx.fillStyle = '#3A2E24';
         ctx.fillRect(-44, -156, 88, 122);
-        // wallpaper pattern (elegant stripes)
-        ctx.strokeStyle = '#5A4A36';
-        ctx.lineWidth = 6;
+        ctx.strokeStyle = '#332820';
+        ctx.lineWidth = 5;
         for (let wx = -44; wx < 44; wx += 14) {
             ctx.beginPath(); ctx.moveTo(wx, -156); ctx.lineTo(wx, -34); ctx.stroke();
         }
 
         const bodyBob = Math.sin(t * 3) * 2;
 
-        // ── Fat cat body ──
-        ctx.beginPath();
-        ctx.ellipse(0, -66 + bodyBob, 34, 30, 0, 0, Math.PI * 2);
-        ctx.fillStyle = '#FFF4DC';
-        ctx.fill();
-        ctx.strokeStyle = '#D4AA64';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        // fat rolls / chins
-        ctx.strokeStyle = '#E8CC8C';
-        ctx.lineWidth = 1.8;
-        ctx.beginPath(); ctx.arc(0, -58 + bodyBob, 24, 0.2, Math.PI - 0.2); ctx.stroke();
-        ctx.beginPath(); ctx.arc(0, -50 + bodyBob, 18, 0.3, Math.PI - 0.3); ctx.stroke();
-
-        // ── Mob-boss bow tie ──
-        const bty = -86 + bodyBob;
-        ctx.fillStyle = '#CC0000';
-        ctx.beginPath(); ctx.moveTo(-10, bty - 5); ctx.lineTo(0, bty); ctx.lineTo(-10, bty + 5); ctx.closePath(); ctx.fill();
-        ctx.beginPath(); ctx.moveTo(10, bty - 5); ctx.lineTo(0, bty); ctx.lineTo(10, bty + 5); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = '#990000';
-        ctx.beginPath(); ctx.arc(0, bty, 3.5, 0, Math.PI * 2); ctx.fill();
-
-        // ── Head (very round, double-chinned) ──
-        ctx.beginPath();
-        ctx.arc(0, -108 + bodyBob, 30, 0, Math.PI * 2);
-        ctx.fillStyle = '#FFF4DC';
-        ctx.fill();
-        ctx.strokeStyle = '#D4AA64';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-        // double chin
-        ctx.beginPath();
-        ctx.ellipse(0, -82 + bodyBob, 22, 12, 0, 0, Math.PI);
-        ctx.fillStyle = '#FFF4DC';
-        ctx.fill();
-
-        // ── Ears ──
-        [[-22, -1], [22, 1]].forEach(([ex, dir]) => {
-            ctx.fillStyle = '#FFF4DC';
-            ctx.strokeStyle = '#D4AA64';
-            ctx.lineWidth = 1.5;
+        // ── CAT EARS — large triangular, dominate the top of the frame ──
+        [[-24, -1], [24, 1]].forEach(([ex, dir]) => {
+            // outer ear (ginger)
+            ctx.fillStyle = catBase;
+            ctx.strokeStyle = catStripe;
+            ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(ex, -124 + bodyBob);
-            ctx.lineTo(ex + dir * 16, -148 + bodyBob);
-            ctx.lineTo(ex + dir * 10, -124 + bodyBob);
+            ctx.moveTo(ex - dir * 4,  -126 + bodyBob);   // inner base
+            ctx.lineTo(ex + dir * 12, -163 + bodyBob);   // tall tip (clips at window top)
+            ctx.lineTo(ex + dir * 24, -126 + bodyBob);   // outer base
             ctx.closePath(); ctx.fill(); ctx.stroke();
-            ctx.fillStyle = '#FFBBCC';
+            // inner pink
+            ctx.fillStyle = catPink;
             ctx.beginPath();
-            ctx.moveTo(ex + dir * 2, -126 + bodyBob);
-            ctx.lineTo(ex + dir * 12, -143 + bodyBob);
-            ctx.lineTo(ex + dir * 8, -126 + bodyBob);
+            ctx.moveTo(ex - dir * 1,  -129 + bodyBob);
+            ctx.lineTo(ex + dir * 12, -156 + bodyBob);   // tip at window edge
+            ctx.lineTo(ex + dir * 19, -129 + bodyBob);
             ctx.closePath(); ctx.fill();
         });
 
-        // ── Eyes (golden, menacing, half-lidded) ──
-        const eyeH = phase >= 2 ? 3 : 5;
-        ctx.fillStyle = '#FFD700';
-        ctx.beginPath(); ctx.ellipse(-12, -110 + bodyBob, 8, eyeH, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(12, -110 + bodyBob, 8, eyeH, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#000';
-        ctx.beginPath(); ctx.ellipse(-12, -110 + bodyBob, phase >= 1 ? 1 : 3, eyeH * 0.75, 0, 0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(12, -110 + bodyBob, phase >= 1 ? 1 : 3, eyeH * 0.75, 0, 0, Math.PI * 2); ctx.fill();
-        // heavy upper lids (menacing)
-        ctx.fillStyle = '#D4AA64';
-        ctx.beginPath(); ctx.ellipse(-12, -114 + bodyBob, 9, 4, 0, Math.PI, 0); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(12, -114 + bodyBob, 9, 4, 0, Math.PI, 0); ctx.fill();
-
-        // ── Nose ──
-        ctx.fillStyle = '#FFAAAA';
-        ctx.beginPath(); ctx.arc(0, -103 + bodyBob, 5, 0, Math.PI * 2); ctx.fill();
-
-        // ── Whiskers (long, elegant) ──
-        ctx.strokeStyle = '#eee';
-        ctx.lineWidth = 1;
-        [-5, 0, 5].forEach(dy => {
-            ctx.beginPath(); ctx.moveTo(-4, -103 + dy + bodyBob); ctx.lineTo(-38, -103 + dy * 1.5 + bodyBob); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(4, -103 + dy + bodyBob); ctx.lineTo(38, -103 + dy * 1.5 + bodyBob); ctx.stroke();
-        });
-
-        // ── Smug expression ──
+        // ── Fat cat body (close-up, large) ──
         ctx.beginPath();
-        ctx.arc(0, -96 + bodyBob, 10, 0.15, Math.PI - 0.15);
-        ctx.strokeStyle = '#A07848';
+        ctx.ellipse(0, -60 + bodyBob, 40, 30, 0, 0, Math.PI * 2);
+        ctx.fillStyle = catBase;
+        ctx.fill();
+        ctx.strokeStyle = catStripe;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // tabby body stripes
+        ctx.strokeStyle = catStripe;
+        ctx.lineWidth = 2.5;
+        [-18, -6, 8, 22].forEach(sx => {
+            ctx.beginPath();
+            ctx.moveTo(sx, -86 + bodyBob);
+            ctx.quadraticCurveTo(sx + 4, -72 + bodyBob, sx, -52 + bodyBob);
+            ctx.stroke();
+        });
+        // lighter belly
+        ctx.beginPath();
+        ctx.ellipse(0, -55 + bodyBob, 26, 18, 0, 0, Math.PI * 2);
+        ctx.fillStyle = catLight;
+        ctx.fill();
+        // fat rolls
+        ctx.strokeStyle = catStripe;
+        ctx.lineWidth = 1.8;
+        ctx.beginPath(); ctx.arc(0, -48 + bodyBob, 28, 0.2, Math.PI - 0.2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(0, -40 + bodyBob, 20, 0.3, Math.PI - 0.3); ctx.stroke();
+
+        // ── Mob-boss bow tie (secondary accent) ──
+        const bty = -84 + bodyBob;
+        ctx.fillStyle = '#CC0000';
+        ctx.beginPath(); ctx.moveTo(-13, bty - 6); ctx.lineTo(0, bty); ctx.lineTo(-13, bty + 6); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(13, bty - 6);  ctx.lineTo(0, bty); ctx.lineTo(13, bty + 6);  ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#990000';
+        ctx.beginPath(); ctx.arc(0, bty, 4, 0, Math.PI * 2); ctx.fill();
+        // gold knot highlight
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.arc(0, bty, 4, 0, Math.PI * 2); ctx.stroke();
+
+        // ── HEAD — large, fills window width, close-up cat face ──
+        ctx.beginPath();
+        ctx.arc(0, -108 + bodyBob, 38, 0, Math.PI * 2);
+        ctx.fillStyle = catBase;
+        ctx.fill();
+        ctx.strokeStyle = catStripe;
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // ── Directing paw (phase 0: casual point; phase 1+: emphatic; phase 2: claws out) ──
+        // tabby M-mark stripes on forehead
+        ctx.strokeStyle = catStripe;
+        ctx.lineWidth = 2;
+        [-12, -4, 4, 12].forEach(sx => {
+            ctx.beginPath();
+            ctx.moveTo(sx, -142 + bodyBob);
+            ctx.quadraticCurveTo(sx + (sx < 0 ? -3 : 3), -132 + bodyBob, sx, -122 + bodyBob);
+            ctx.stroke();
+        });
+
+        // cheek tabby dash-marks
+        ctx.lineWidth = 1.5;
+        [[-32, -108], [24, -108]].forEach(([markX, markY]) => {
+            [-5, 0, 5].forEach(dy => {
+                ctx.beginPath();
+                ctx.moveTo(markX, markY + dy + bodyBob);
+                ctx.lineTo(markX + (markX < 0 ? -9 : 9), markY + dy + bodyBob);
+                ctx.stroke();
+            });
+        });
+
+        // lighter muzzle area
+        ctx.beginPath();
+        ctx.ellipse(0, -100 + bodyBob, 20, 16, 0, 0, Math.PI * 2);
+        ctx.fillStyle = catLight;
+        ctx.fill();
+
+        // double chin
+        ctx.beginPath();
+        ctx.ellipse(0, -73 + bodyBob, 28, 15, 0, 0, Math.PI);
+        ctx.fillStyle = catLight;
+        ctx.fill();
+        ctx.strokeStyle = catStripe;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(0, -73 + bodyBob, 27, 0, Math.PI); ctx.stroke();
+
+        // ── Eyes (large amber irises, vertical slit pupils, menacing) ──
+        const eyeH = phase >= 2 ? 5 : 8;
+        ctx.fillStyle = '#FFB800';
+        ctx.beginPath(); ctx.ellipse(-14, -113 + bodyBob, 11, eyeH, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse( 14, -113 + bodyBob, 11, eyeH, 0, 0, Math.PI * 2); ctx.fill();
+        // slit pupils
+        const pupilW = phase >= 1 ? 1.5 : 3;
+        ctx.fillStyle = '#000';
+        ctx.beginPath(); ctx.ellipse(-14, -113 + bodyBob, pupilW, eyeH * 0.85, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse( 14, -113 + bodyBob, pupilW, eyeH * 0.85, 0, 0, Math.PI * 2); ctx.fill();
+        // eye gleam
+        ctx.fillStyle = 'rgba(255,255,255,0.65)';
+        ctx.beginPath(); ctx.arc(-11, -116 + bodyBob, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc( 17, -116 + bodyBob, 3, 0, Math.PI * 2); ctx.fill();
+        // heavy upper lids (menacing)
+        ctx.fillStyle = catBase;
+        ctx.beginPath(); ctx.ellipse(-14, -118 + bodyBob, 12, 5, 0, Math.PI, 0); ctx.fill();
+        ctx.beginPath(); ctx.ellipse( 14, -118 + bodyBob, 12, 5, 0, Math.PI, 0); ctx.fill();
+        // angry brow furrow
+        ctx.strokeStyle = catStripe;
+        ctx.lineWidth = 2.5;
+        ctx.beginPath(); ctx.moveTo(-26, -124 + bodyBob); ctx.lineTo(-5, -120 + bodyBob); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo( 26, -124 + bodyBob); ctx.lineTo( 5, -120 + bodyBob); ctx.stroke();
+
+        // ── Nose (triangular — classic cat) ──
+        ctx.fillStyle = catPink;
+        ctx.beginPath();
+        ctx.moveTo(0,  -103 + bodyBob);
+        ctx.lineTo(-6, -97 + bodyBob);
+        ctx.lineTo( 6, -97 + bodyBob);
+        ctx.closePath(); ctx.fill();
+        // philtrum
+        ctx.strokeStyle = catStripe;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(0, -97 + bodyBob); ctx.lineTo(0, -93 + bodyBob); ctx.stroke();
+
+        // ── Smug cat mouth ──
+        ctx.beginPath();
+        ctx.moveTo(-10, -93 + bodyBob);
+        ctx.quadraticCurveTo(-14, -89 + bodyBob, -9, -87 + bodyBob);
+        ctx.moveTo( 10, -93 + bodyBob);
+        ctx.quadraticCurveTo( 14, -89 + bodyBob,  9, -87 + bodyBob);
+        ctx.strokeStyle = catStripe;
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        // ── Dramatic long whiskers (reach window edges) ──
+        ctx.strokeStyle = '#eee';
+        ctx.lineWidth = 1.2;
+        [-6, 0, 6].forEach(dy => {
+            ctx.beginPath(); ctx.moveTo(-4, -99 + dy + bodyBob); ctx.lineTo(-46, -99 + dy * 1.7 + bodyBob); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo( 4, -99 + dy + bodyBob); ctx.lineTo( 46, -99 + dy * 1.7 + bodyBob); ctx.stroke();
+        });
+        // eyebrow tufts
+        ctx.lineWidth = 0.9;
+        ctx.beginPath(); ctx.moveTo(-22, -125 + bodyBob); ctx.lineTo(-44, -130 + bodyBob); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo( 22, -125 + bodyBob); ctx.lineTo( 44, -130 + bodyBob); ctx.stroke();
+
+        // ── Directing paw (mob boss gesture) ──
         const pawSwing = Math.sin(t * 2.5) * (phase >= 1 ? 20 : 10) - 10;
         ctx.save();
-        ctx.translate(-32, -72 + bodyBob);
+        ctx.translate(-36, -64 + bodyBob);
         ctx.rotate((pawSwing * Math.PI) / 180);
-        ctx.fillStyle = '#FFF4DC';
-        ctx.strokeStyle = '#D4AA64';
+        ctx.fillStyle = catBase;
+        ctx.strokeStyle = catStripe;
         ctx.lineWidth = 1.5;
-        // arm
-        ctx.beginPath(); ctx.roundRect(-5, 0, 10, 20, 5); ctx.fill(); ctx.stroke();
-        // paw
-        ctx.beginPath(); ctx.arc(-1, 24, 9, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-        // claws (always visible on the boss - just extended further in phase 2)
+        ctx.beginPath(); ctx.roundRect(-6, 0, 12, 22, 5); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(-1, 26, 10, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
         const clawLen = phase >= 2 ? 14 : 7;
-        ctx.strokeStyle = '#999';
-        ctx.lineWidth = 1.2;
+        ctx.strokeStyle = '#ccc';
+        ctx.lineWidth = 1.5;
         for (let c = 0; c < 4; c++) {
             const ang = ((c / 3.5) - 0.5) * Math.PI * 0.9;
             ctx.beginPath();
-            ctx.moveTo(-1 + Math.cos(ang) * 7, 24 + Math.sin(ang) * 7);
-            ctx.lineTo(-1 + Math.cos(ang) * (7 + clawLen), 24 + Math.sin(ang) * (7 + clawLen));
+            ctx.moveTo(-1 + Math.cos(ang) * 8, 26 + Math.sin(ang) * 8);
+            ctx.lineTo(-1 + Math.cos(ang) * (8 + clawLen), 26 + Math.sin(ang) * (8 + clawLen));
             ctx.stroke();
         }
         ctx.restore();
 
-        // ── Speech bubble (directing cats) ──
-        if (phase >= 0) {
-            const phrases = [['GET HIM!', 'BOYS GO!'], ['SURROUND', 'HIM NOW!'], ['DESTROY', 'THAT DOG!']];
-            const p = phrases[Math.min(phase, 2)];
-            const bubbleVisible = Math.floor(t * 20) % 60 < 40;
-            if (bubbleVisible) {
-                ctx.fillStyle = '#fff';
-                ctx.beginPath(); ctx.ellipse(36, -140 + bodyBob, 28, 18, 0.1, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#CC0000'; ctx.lineWidth = 2; ctx.stroke();
-                ctx.fillStyle = '#CC0000';
-                ctx.font = 'bold 7px Impact';
-                ctx.textAlign = 'center';
-                ctx.fillText(p[0], 36, -145 + bodyBob);
-                ctx.fillText(p[1], 36, -135 + bodyBob);
-            }
+        // ── Speech bubble (mob boss directing — secondary accent) ──
+        const phrases = [['GET HIM!', 'BOYS GO!'], ['SURROUND', 'HIM NOW!'], ['DESTROY', 'THAT DOG!']];
+        const p = phrases[Math.min(phase, 2)];
+        const bubbleVisible = Math.floor(t * 20) % 60 < 40;
+        if (bubbleVisible) {
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.ellipse(38, -148 + bodyBob, 30, 18, 0.1, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#CC0000'; ctx.lineWidth = 2; ctx.stroke();
+            ctx.fillStyle = '#CC0000';
+            ctx.font = 'bold 7px Impact';
+            ctx.textAlign = 'center';
+            ctx.fillText(p[0], 38, -153 + bodyBob);
+            ctx.fillText(p[1], 38, -143 + bodyBob);
         }
 
         ctx.restore(); // end interior clip
 
         // ── Window screen mesh ──
         if (phase < 2) {
-            // intact screen
             ctx.save();
             ctx.globalAlpha = 0.22;
             ctx.strokeStyle = '#667';
@@ -548,7 +625,7 @@ const Sprites = {
             }
             ctx.restore();
         } else {
-            // torn screen — ragged strips hanging down
+            // torn screen
             ctx.save();
             ctx.globalAlpha = 0.3;
             ctx.strokeStyle = '#889';
@@ -560,14 +637,14 @@ const Sprites = {
                 ctx.beginPath(); ctx.moveTo(gx, tearY); ctx.lineTo(gx + U.rnd(-6, 6), tearY + 35 + (i % 2) * 20); ctx.stroke();
             });
             ctx.restore();
-            // red eyes glow through torn screen in phase 2
+            // amber eyes glowing through torn screen in phase 2
             ctx.save();
-            ctx.globalAlpha = 0.5;
-            ctx.shadowColor = '#FF0000';
-            ctx.shadowBlur = 20;
-            ctx.fillStyle = '#FF0000';
-            ctx.beginPath(); ctx.arc(-12, -110 + Math.sin(t * 3) * 2, 5, 0, Math.PI * 2); ctx.fill();
-            ctx.beginPath(); ctx.arc(12, -110 + Math.sin(t * 3) * 2, 5, 0, Math.PI * 2); ctx.fill();
+            ctx.globalAlpha = 0.55;
+            ctx.shadowColor = '#FFB800';
+            ctx.shadowBlur = 22;
+            ctx.fillStyle = '#FFB800';
+            ctx.beginPath(); ctx.ellipse(-14, -113 + Math.sin(t * 3) * 2, 8, 5, 0, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse( 14, -113 + Math.sin(t * 3) * 2, 8, 5, 0, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
         }
 
@@ -588,16 +665,16 @@ const Sprites = {
         ctx.textAlign = 'center';
         ctx.fillText('DON WHISKERS', 0, -24);
 
-        // ── Phase 2: paw swiping through torn screen ──
+        // ── Phase 2: ginger paw swiping through torn screen ──
         if (phase >= 2 && Math.sin(t * 4) > 0.3) {
             const swipeX = Math.sin(t * 4) * 20 - 30;
             ctx.save();
             ctx.translate(swipeX, -70);
-            ctx.fillStyle = '#FFF4DC';
-            ctx.strokeStyle = '#D4AA64';
+            ctx.fillStyle = catBase;
+            ctx.strokeStyle = catStripe;
             ctx.lineWidth = 2;
             ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-            ctx.strokeStyle = '#888';
+            ctx.strokeStyle = '#ccc';
             ctx.lineWidth = 1.5;
             for (let c = 0; c < 5; c++) {
                 const ang = ((c / 4.5) - 0.5) * Math.PI;

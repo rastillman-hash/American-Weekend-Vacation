@@ -1,0 +1,12 @@
+{
+  "name": "golden-biscuit",
+  "version": "1.0.0",
+  "description": "Golden Biscuit — 7-level platformer by Stilly",
+  "private": true,
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
